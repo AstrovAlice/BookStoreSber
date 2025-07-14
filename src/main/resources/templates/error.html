@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            width: 100%;
+        }
+
+        .error-image {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideIn 0.5s ease-out forwards 0.3s;
+        }
+
+        .error-text {
+            font-size: 72px;
+            font-weight: bold;
+            color: #343a40;
+            margin: 20px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards 0.8s;
+        }
+
+        .home-button {
+            padding: 12px 30px;
+            background-color: #162c3e;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards 1.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="/images/okak.png" alt="Error" class="error-image" />
+    <div class="error-text">окак</div>
+    <button onclick="window.location.href='/'" class="home-button">На главную</button>
+</div>
+</body>
+</html>

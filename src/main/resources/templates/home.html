@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Книжный магазин</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+    <link th:href="@{/css/header.css}" rel="stylesheet">
+    <link th:href="@{/css/footer.css}" rel="stylesheet">
+    <link th:href="@{/css/home.css}" rel="stylesheet">
+</head>
+
+<header class="fixed-header">
+    <div class="container header-content">
+        <h1 class="header-title">
+            <a href="/" style="text-decoration: none; color: inherit;">Книжный магазин Сбера</a>
+        </h1>
+        <div class="d-flex align-items-center gap-3">
+            <div sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="btn btn-outline-primary nav-btn">Вход</a>
+                <a th:href="@{/register}" class="btn btn-primary nav-btn">Регистрация</a>
+            </div>
+            <div sec:authorize="hasRole('USER')" class="d-flex gap-2">
+                <a href="/cart" class="btn btn-outline-secondary nav-btn">
+                    Корзина (<span th:text="${cartSize}">0</span>)
+                </a>
+                <a href="/orders" class="btn btn-outline-primary nav-btn">Заказы</a>
+            </div>
+            <div sec:authorize="hasRole('ADMIN')" class="d-flex gap-2">
+                <a href="/admin" class="btn btn-dark nav-btn">Настройки</a>
+            </div>
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                <span class="me-2"><span sec:authentication="name" class="fw-semibold"></span></span>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Выйти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<body>
+<main class="main-content">
+    <div class="container mt-4">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="mb-0">Книги:</h2>
+            <div sec:authorize="hasRole('EMPLOYEE')">
+                <a href="/books/new" class="btn btn-success nav-btn">
+                    Добавить новую книгу
+                </a>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col" th:each="book : ${books}">
+                <div class="card h-100 book-card" th:attr="data-href=@{'/books/' + ${book.id}}">
+                    <img th:src="@{${book.coverImagePath}}" alt="Обложка книги" class="card-img-top book-img">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title" th:text="${book.title}"></h5>
+                        <p class="text-muted mb-2" th:text="${book.author}"></p>
+                        <p class="fw-bold mb-3" th:text="${book.price} + ' ₽'"></p>
+                        <div class="mt-auto">
+                            <p>
+                                <span th:if="${book.quantity >= 1 and book.quantity < 5}"
+                                      class="badge badge-warning status-badge"
+                                      th:text="'Осталось ' + ${book.quantity}">
+                                </span>
+                                <span th:if="${book.quantity < 1}" class="badge badge-danger status-badge">
+                                        Нет в наличии
+                                    </span>
+                                <span th:if="${book.quantity >= 5}" class="badge badge-success status-badge">
+                                        В наличии
+                                    </span>
+                            </p>
+                            <span th:if="${book.newBook}" class="badge badge-info status-badge">Новинка</span>
+                        </div>
+                    </div>
+
+                    <div sec:authorize="hasRole('USER')" class="p-3 pt-0">
+                        <div th:if="${cartMap != null and cartMap[book.id] != null}">
+                            <p class="text-success mb-2">
+                                Товар в корзине: [[${cartMap[book.id]}]] шт.
+                            </p>
+                            <a th:if="${cartMap[book.id] < book.quantity}"
+                               th:href="@{/cart/add/{id}(id=${book.id})}"
+                               class="btn btn-primary btn-sm">Добавить ещё</a>
+                            <p th:if="${cartMap[book.id] >= book.quantity}" class="text-danger small mb-0 mt-1">
+                                Больше добавить нельзя
+                            </p>
+                        </div>
+                        <div th:if="${cartMap == null or cartMap[book.id] == null}">
+                            <a th:href="@{/cart/add/{id}(id=${book.id})}" class="btn btn-primary btn-sm">В корзину</a>
+                        </div>
+                    </div>
+
+                    <a class="text-decoration-none text-center py-2 bg-light fw-bold"
+                       style="border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-links">
+        Сайт написан на практике в СберТех, г. Вологда
+    </div>
+    <div class="footer-copyright">
+        © 2025 Книжный магазин. Все права защищены.
+    </div>
+</footer>
+
+<script>
+    document.querySelectorAll('.book-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+                return;
+            }
+            const url = card.getAttribute('data-href');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
