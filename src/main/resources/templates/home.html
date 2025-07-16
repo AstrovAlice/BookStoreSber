@@ -66,16 +66,15 @@
                         <p class="fw-bold mb-3" th:text="${book.price} + ' ₽'"></p>
                         <div class="mt-auto">
                             <p>
-                                <span th:if="${book.quantity >= 1 and book.quantity < 5}"
-                                      class="badge badge-warning status-badge"
-                                      th:text="'Осталось ' + ${book.quantity}">
-                                </span>
+                                <span th:if="${book.quantity >= 1 and book.quantity < 5}" class="badge badge-warning status-badge">
+                                    Осталось мало
+                                    </span>
                                 <span th:if="${book.quantity < 1}" class="badge badge-danger status-badge">
-                                        Нет в наличии
+                                    Нет в наличии
                                     </span>
                                 <span th:if="${book.quantity >= 5}" class="badge badge-success status-badge">
-                                        В наличии
-                                    </span>
+                                    В наличии
+                                </span>
                             </p>
                             <span th:if="${book.newBook}" class="badge badge-info status-badge">Новинка</span>
                         </div>
