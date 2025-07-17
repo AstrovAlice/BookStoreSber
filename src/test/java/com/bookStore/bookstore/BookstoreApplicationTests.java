@@ -25,6 +25,17 @@ class AdminControllerTests {
 	private AdminController adminController;
 
 	@Test
+	void addEmployee_ShouldCallServiceAndRedirect() {
+		String username = "newEmp";
+		String password = "password123";
+
+		String redirectUrl = adminController.addEmployee(username, password);
+
+		assertThat(redirectUrl).isEqualTo("redirect:/admin/employees");
+		verify(userService).registerEmployee(username, password);
+	}
+
+	@Test
 	void dashboard_ShouldAddCountsAndReturnView() {
 		when(userService.countByRole("ROLE_USER")).thenReturn(10L);
 		when(userService.countByRole("ROLE_EMPLOYEE")).thenReturn(5L);
@@ -36,17 +47,6 @@ class AdminControllerTests {
 		verify(model).addAttribute("clientsCount", 10L);
 		verify(model).addAttribute("employeesCount", 5L);
 		verify(model).addAttribute("booksCount", 100L);
-	}
-
-	@Test
-	void addEmployee_ShouldCallServiceAndRedirect() {
-		String username = "newEmp";
-		String password = "password123";
-
-		String redirectUrl = adminController.addEmployee(username, password);
-
-		assertThat(redirectUrl).isEqualTo("redirect:/admin/employees");
-		verify(userService).registerEmployee(username, password);
 	}
 
 	@Test
