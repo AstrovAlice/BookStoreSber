@@ -53,9 +53,9 @@ public class CartController {
         if (cartMap != null && cartMap.containsKey(id)) {
             int qty = cartMap.get(id);
             if (qty > 1) {
-                cartMap.put(id, qty - 1); // уменьшаем на 1
+                cartMap.put(id, qty - 1);
             } else {
-                cartMap.remove(id); // полностью удаляем
+                cartMap.remove(id);
             }
         }
 
@@ -76,16 +76,16 @@ public class CartController {
                 Book book = bookRepository.findById(entry.getKey()).orElse(null);
                 if (book != null) {
                     total += book.getPrice() * entry.getValue();
-                    book.setQuantity(book.getQuantity() - entry.getValue()); // уменьшаем количество на складе
+                    book.setQuantity(book.getQuantity() - entry.getValue());
                     bookRepository.save(book);
                 }
             }
 
             order.setTotalPrice(total);
-            order.setStatus("Ожидает"); // можно потом добавить обработку
+            order.setStatus("Ожидает");
             order.setCreatedAt(java.time.LocalDateTime.now());
 
-            orderRepository.save(order); // сохраняем заказ
+            orderRepository.save(order);
         }
 
         session.removeAttribute("cart");
